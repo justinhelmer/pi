@@ -108,6 +108,7 @@ function convertToolResultOutput<TApi extends Api>(
 }
 
 export interface OpenAIResponsesStreamOptions {
+	lazyToolArguments?: StreamOptions["lazyToolArguments"];
 	onProviderStreamEvent?: StreamOptions["onProviderStreamEvent"];
 	serviceTier?: ResponseCreateParamsStreaming["service_tier"];
 	grammarToolInputProperties?: ReadonlyMap<string, string>;
@@ -408,6 +409,27 @@ type StreamingToolCall = ToolCall & {
 	};
 };
 
+function updateStreamingToolArguments(block: StreamingToolCall, lazy: boolean): void {
+	const partialJson = block.partialJson;
+	// Non-string wire values retain the parser's existing failure timing.
+	if (!lazy || typeof partialJson !== "string") {
+		block.arguments = parseStreamingJson(partialJson!);
+		return;
+	}
+	const replace = (value: ToolCall["arguments"]): void => {
+		Object.defineProperty(block, "arguments", { value, writable: true, enumerable: true, configurable: true });
+	};
+	Object.defineProperty(block, "arguments", {
+		enumerable: true,
+		configurable: true,
+		get() {
+			const value = parseStreamingJson<ToolCall["arguments"]>(partialJson);
+			replace(value);
+			return value;
+		},
+		set: replace,
+	});
+}
 function getCustomToolCallInput(block: StreamingToolCall): string {
 	const property = block.customInput?.property;
 	if (property === undefined) return "";
@@ -656,7 +678,7 @@ export async function processResponsesStream<TApi extends Api>(
 			const slot = getSlot(event.output_index, "toolCall");
 			if (!slot || slot.block.partialJson === undefined) continue;
 			slot.block.partialJson += event.delta;
-			slot.block.arguments = parseStreamingJson(slot.block.partialJson);
+			updateStreamingToolArguments(slot.block, options?.lazyToolArguments === true);
 			pushToolCallDelta(slot, event.delta);
 		} else if (event.type === "response.function_call_arguments.done") {
 			const slot = getSlot(event.output_index, "toolCall");

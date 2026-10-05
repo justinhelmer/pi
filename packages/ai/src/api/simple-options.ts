@@ -41,6 +41,7 @@ export function buildBaseOptions(
 ): StreamOptions {
 	const samplingParams = resolveSamplingParams(model, options?.reasoning ?? "off", options?.samplingParams);
 	return {
+		lazyToolArguments: options?.lazyToolArguments,
 		temperature: options?.temperature,
 		samplingParams,
 		maxTokens: clampMaxTokensToContext(model, context, options?.maxTokens ?? model.maxTokens),

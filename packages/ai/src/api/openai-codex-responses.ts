@@ -671,6 +671,7 @@ async function processStream(
 		stream,
 		model,
 		{
+			lazyToolArguments: options?.lazyToolArguments,
 			serviceTier: options?.serviceTier,
 			grammarToolInputProperties,
 			resolveServiceTier: resolveCodexServiceTier,
@@ -1554,6 +1555,7 @@ async function processWebSocketStream(
 			stream,
 			model,
 			{
+				lazyToolArguments: options?.lazyToolArguments,
 				serviceTier: options?.serviceTier,
 				grammarToolInputProperties,
 				resolveServiceTier: resolveCodexServiceTier,

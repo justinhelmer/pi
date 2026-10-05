@@ -329,6 +329,7 @@ export async function createAgentSession(options: CreateAgentSessionOptions = {}
 		const headerRunner = extensionRunnerRef.current;
 		return {
 			...options,
+			lazyToolArguments: options.lazyToolArguments ?? true,
 			timeoutMs: options.timeoutMs ?? providerRetrySettings.timeoutMs ?? effectiveTimeoutMs,
 			websocketConnectTimeoutMs: options.websocketConnectTimeoutMs ?? settingsManager.getWebSocketConnectTimeoutMs(),
 			maxRetries: options.maxRetries ?? providerRetrySettings.maxRetries,

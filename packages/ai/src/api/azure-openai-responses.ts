@@ -95,6 +95,7 @@ export const stream: StreamFunction<"azure-openai-responses", AzureOpenAIRespons
 			stream.push({ type: "start", partial: output });
 
 			await processResponsesStream(openaiStream, output, stream, model, {
+				lazyToolArguments: options?.lazyToolArguments,
 				onProviderStreamEvent: options?.onProviderStreamEvent,
 				grammarToolInputProperties,
 			});

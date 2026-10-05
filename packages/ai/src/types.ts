@@ -187,6 +187,12 @@ export interface ProviderRequestOptions<TModel = Model<Api>> {
 }
 
 export interface StreamOptions extends ProviderRequestOptions<Model<Api>> {
+	/** Parse function-call delta arguments on first read instead of on every delta.
+	 * Defaults to false. Supported by OpenAI Responses, Azure Responses and Codex
+	 * Responses; other adapters ignore this option. Final argument events remain
+	 * eager. Unread delta arguments use enumerable, configurable accessors until
+	 * first read or assignment. Reading every delta still reparses every prefix. */
+	lazyToolArguments?: boolean;
 	/**
 	 * Optional callback invoked after an HTTP response is received and before
 	 * its body stream is consumed.
